@@ -1,0 +1,1 @@
+"""Custom applications installed by devoweled project."""
