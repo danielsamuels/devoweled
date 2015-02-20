@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% load words_tags %}
+
+{% block content_primary %}
+
+{% word length=request.GET.length|default:3 difficulty=request.GET.difficulty|default:5 as word %}
+
+{% if not word.letters %}
+<script>
+{% if word.length < 1 or word.difficulty < 1 %}
+window.location = '/';
+{% else %}
+window.location = '/?length={{ word.length }}&difficulty={{ word.difficulty }}';
+{% endif %}
+</script>
+{% endif %}
+
+<ul class="word">
+    {% for letter in word.letters|make_list %}
+        {% if forloop.first %}
+            <li class="add">+</li>
+        {% endif %}
+
+        <li class="letter">{{ letter }}</li>
+        <li class="add">+</li>
+    {% endfor %}
+</ul>
+
+<ul>
+    {% for key in word.possible %}
+        <li>
+            {{ key }} letter words: {{ word.possible|get_item:key|length }}.
+            <span class="answers">
+            {% for word in word.possible|get_item:key %}
+                <span class="answer" data-value="{{ word }}">{{ word }}{% if not forloop.last %}, {% endif %}</span>
+            {% endfor %}
+            </span>
+        </li>
+    {% endfor %}
+</ul>
+
+<p>
+    <a href="">New word</a> |
+    <a href="#" class="reset">Reset</a> |
+    <a href="#" class="check">Check</a> |
+    <a href="#" class="solve">See answers</a>
+</p>
+
+<p>
+    <form action="/" method="get">
+        <strong># of letters:</strong> <input name="length" type="text" value="{{ word.length }}"><br>
+        <strong>Min num of answers:</strong> <input name="difficulty" type="text" value="{{ word.difficulty }}"><br>
+        <input type="submit">
+    </form>
+</p>
+
+<ul class="options">
+    <li>a</li>
+    <li>e</li>
+    <li>i</li>
+    <li>o</li>
+    <li>u</li>
+</ul>
+
+<script>
+var words = [
+    {% for key in word.possible %}
+        {% for word in word.possible|get_item:key %}
+            "{{ word }}",
+        {% endfor %}
+    {% endfor %}
+];
+</script>
+{% endblock %}

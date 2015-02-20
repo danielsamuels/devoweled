@@ -36,6 +36,8 @@ urlpatterns = patterns(
     # There's no favicon here!
     url(r"^favicon.ico$", generic.RedirectView.as_view()),
 
+    url(r'^', include('devoweled.apps.words.urls', namespace="words")),
+
 ) + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

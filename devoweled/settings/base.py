@@ -14,9 +14,9 @@ import os
 
 # The name of this site.  Used for branding in the online admin area.
 
-SITE_NAME = "Example"
+SITE_NAME = "Devoweled"
 
-SITE_DOMAIN = "example.com"
+SITE_DOMAIN = "Devoweled.com"
 
 PREPEND_WWW = True
 
