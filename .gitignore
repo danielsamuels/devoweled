@@ -45,6 +45,8 @@ reports/
 .mr.developer.cfg
 .project
 .pydevproject
+*.sublime-project
+*.sublime-workspace
 
 # Rope
 .ropeproject
@@ -61,3 +63,10 @@ docs/_build/
 
 # IntelliJ
 *.idea
+
+# Leftovers from mergetool
+*.orig
+
+node_modules/
+bower_components/
+*/static/css/
