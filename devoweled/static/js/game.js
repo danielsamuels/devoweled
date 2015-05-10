@@ -1,106 +1,200 @@
-var initial_height = 112;
+var base_font_size = 192,
+    vowels = ['a', 'e', 'i', 'o', 'u'],
+    solved = [],
+    hint_timer = null,
+    answers_visible = false;
 
-function checkWordHeight() {
-    while ($('.word').height() > initial_height) {
-        letter_font_size = parseInt($('.letter').css('font-size'));
-        $('.letter').css('font-size', (letter_font_size-1) + 'px');
+function resizeInputText() {
+    el = $('#game_input')[0];
+    attempts = 0;
 
-        if (letter_font_size > 100) {
-            $('.add').css('font-size', (letter_font_size-84) + 'px');
-        }
+    $(el).css({
+        fontSize: base_font_size,
+        paddingTop: 0
+    })
+
+    while (el.scrollWidth > el.clientWidth) {
+        size = parseFloat($(el).css('font-size'));
+        new_size = size - 1;
+        $(el).css({
+            fontSize: new_size,
+            paddingTop: (base_font_size - new_size) / 2,
+        });
+        attempts++;
     }
 }
 
+function checkWord() {
+    input = $('#game_input').val().toLowerCase().trim();
+
+    // Already solved
+    if (solved.indexOf(input) !== -1) {
+        $('body').addClass('previous');
+        return true;
+    }
+
+    if (words.indexOf(input) !== -1) {
+        // The word was correct!
+        $('body').addClass('correct');
+
+        // Add to the solved list.
+        solved.push(input);
+
+        // Show the answer on the page.
+        $('.answer[data-value=' + input + ']').show();
+        $('.answers-' + input.length).show();
+
+        // Update the count.
+        len_count = 0;
+        for (var i=0; i<solved.length; i++) {
+            if (solved[i].length == input.length) {
+                len_count++;
+            }
+        }
+        $('.track-' + input.length).html(len_count);
+
+    } else {
+        $('body').addClass('incorrect');
+    }
+}
+
+function provideHint() {
+    clearInterval(hint_timer);
+
+    // Look for an unsolved word.
+    el = $('.answer').not(':visible')[0]
+
+    if (typeof el === "undefined") {
+        $('#hint h1').html('');
+        return;
+    }
+
+    word = $(el).attr('data-value');
+
+    // Get the number of vowels.
+    word_vowels = [];
+
+    for (var i=0; i<vowels.length; i++) {
+        count = (word.match(new RegExp(vowels[i], 'g')) || []).length;
+
+        if (count > 0) {
+            word_vowels.push(count + 'x ' + vowels[i].toLowerCase());
+        }
+    }
+
+    $('#hint h1').html("Hint: " + word_vowels.join("&nbsp;&nbsp;"));
+
+    hint_timer = setTimeout(function() {
+        $('#hint h1').html('');
+    }, 5000);
+}
 
 $(function () {
-    $(document).on('click', function (e) {
-        if (e.target.className === "add active") {
-            return true;
-        }
-
-        if ($('.options.active')) {
-            $('.options').removeClass('active');
-        }
-
-        return true;
-    })
-
-    $('.word').on('click', '.add', function (e) {
-        $('.add').removeClass('active');
-        $(this).addClass('active');
-
-        $('.options').css({
-            position: 'absolute',
-            left: e.originalEvent.x,
-            top: e.originalEvent.y
-        }).addClass('active');
+    $('body').on('webkitAnimationEnd oanimationend msAnimationEnd animationend', function(e) {
+        $('body').removeClass('correct incorrect previous');
     });
 
-    $('.word').on('click', '.vowel', function () {
-        $(this).next().remove();
-        $(this).remove();
-    });
+    $('#game_input').on('keydown', function(e) {
+        caret = $(this).caret();
 
-    $('.options li').on('click', function () {
-        $el = $('<li/>', {
-            'class': 'letter vowel'
-        }).html($(this).html());
+        if (e.which == 13) {  // Enter
+            checkWord();
+        } else if (e.which == 8) {  // Backspace
+            // Get the previous letter.
+            letter = $(this).val().substr(caret.start-1, 1)
 
-        $('.add.active').after($el)
-        $el.after($('<li/>', {
-            'class': 'add'
-        }).html('+'));
+            if (vowels.indexOf(letter.toLowerCase()) !== -1) {
+                // Remove the letter manually.
+                before = $(this).val().substr(0, caret.start)
+                after = $(this).val().substr(caret.start)
 
-        checkWordHeight();
-    });
+                // Remove the last character.
+                new_before = before.substr(0, before.length - 1);
+                $(this).val(new_before + after);
 
-    $('.reset').on('click', function () {
-        $('.vowel, .vowel + .add').remove();
-        $('.word').removeClass('win lose');
+                // Put the caret back.
+                $(this)[0].setSelectionRange(caret.start-1, caret.start-1);
+            } else {
+                // Move back to the previous vowel.
+                string = $(this).val().substr(0, caret.start);
 
-        $('.letter').each(function () {
-            if ($(this).next().hasClass('add')) {
-                return true;
+                for (var i=1; i<=string.length; i++) {
+                    letter = string[string.length - i];
+
+                    if (vowels.indexOf(letter.toLowerCase()) !== -1) {
+                        // Move the caret to this letter (but don't delete it).
+                        $(this)[0].setSelectionRange(string.length - i + 1, string.length - i + 1);
+
+                        break;
+                    }
+                }
             }
+        } else if (
+            e.which == 65 ||  // A
+            e.which == 69 ||  // E
+            e.which == 73 ||  // I
+            e.which == 79 ||  // O
+            e.which == 85     // U
+        ) {
+            // Add the letter manually.
+            before = $(this).val().substr(0, caret.start)
+            after = $(this).val().substr(caret.start)
 
-            $(this).after($('<li/>', {
-                'class': 'add'
-            }).html('+'));
-        });
+            $(this).val(before + String.fromCharCode(e.which) + after);
 
-        return false;
-    });
+            // Put the caret back.
+            $(this)[0].setSelectionRange(caret.start+1, caret.start+1);
+        } else if (
+            e.which == 37 ||  // Left arrow
+            e.which == 39     // Right arrow
+        ) {
+            return true;
+        } else if (e.which == 27) {  // Escape
+            $(this).blur();
+        } else if (e.which == 82) {  // R
+            // Remove all vowels from the string.
+            $(this).val($(this).val().replace(/[aeiou]/ig, ''));
 
-    $('.solve').on('click', function () {
-        $('.answers').toggle();
-    });
+            // Move the caret to the start.
+            $(this)[0].setSelectionRange(0, 0);
+        } else if (e.which == 72) {  // H
+            provideHint();
+        } else if (e.which == 78) {  // N
+            window.location.reload();
+        } else if (e.which == 86) {  // V
+            if ( ! answers_visible) {
+                $('.answer, .answers').show();
+                answers_visible = true;
+            } else {
+                $('.answer, .answers').hide();
+                answers_visible = false;
 
-    $('.check').on('click', function () {
-        $('.word').removeClass('win lose');
-
-        str = '';
-        $('.letter').each(function () {
-            str = str + $(this).html();
-        });
-
-        str = str.trim();
-
-        if (words.indexOf(str) !== -1) {
-            $('.add').remove();
-            $('.word').addClass('win');
-
-            $('.letter').css('font-size', '');
-            checkWordHeight();
+                for (var i=0; i<solved.length; i++) {
+                    // Show the answer on the page.
+                    $('.answer[data-value=' + solved[i] + ']').show();
+                    $('.answers-' + solved[i].length).show();
+                }
+            }
         } else {
-            $('.word').addClass('lose');
+            known = [
+                16  // Shift
+            ]
 
-            setTimeout(function () {
-                $('.word').removeClass('lose');
-            }, 2500);
-        };
+            if (known.indexOf(e.which) === -1) {
+                console.debug(e.which);
+            }
+        }
 
+        resizeInputText();
         return false;
     });
 
-    checkWordHeight();
+    $('header').addClass('seen');
+    $('#game_input').focus();
+
+    // Help out the filthy cheaters.
+    if (typeof console !== "undefined") {
+        console.log("Where's the fun in cheating? You're going figure out the variable name anyway, so I'll save you the time:");
+        console.log(words);
+    }
 });

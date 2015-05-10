@@ -2,6 +2,8 @@ from django import template
 
 from ..models import Word
 
+from collections import OrderedDict
+
 register = template.Library()
 
 
@@ -45,6 +47,8 @@ def word(length=3, difficulty=5, attempt=1):
             words[possibility.full_word_length] = []
 
         words[possibility.full_word_length].append(possibility.full_word)
+
+    words = OrderedDict(sorted(words.items()))
 
     return {
         'letters': letters,

@@ -20,20 +20,12 @@
 
     <body class="{% block body_class %}{% endblock %}">
 
-		{% include 'browser_update.html' %}
+        {% block content_primary %}{% endblock %}
 
-        <header>
-            <h1><a href="/">{{settings.SITE_NAME}}</a></h1>
-        </header>
+        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 
-        {% block content_primary %}{{pages.current.content.content_primary|html}}{% endblock %}
-
-        <footer>
-            <p>© {% now "Y" %} Site owner.</p>
-        </footer>
-
-        <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         {% compress js %}
+        <script src="/static/js/jquery.caret.1.02.js"></script>
         <script src="/static/js/game.js"></script>
         {% endcompress %}
 

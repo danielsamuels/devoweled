@@ -3,64 +3,46 @@
 
 {% block content_primary %}
 
-{% word length=request.GET.length|default:3 difficulty=request.GET.difficulty|default:5 as word %}
+<div class="row" style="text-align: center;">
+    <header>
+        <h1>{{ settings.SITE_NAME }}</h1>
+        <h2>Add vowels to create a word.</h2>
+    </header>
 
-{% if not word.letters %}
-<script>
-{% if word.length < 1 or word.difficulty < 1 %}
-window.location = '/';
-{% else %}
-window.location = '/?length={{ word.length }}&difficulty={{ word.difficulty }}';
-{% endif %}
-</script>
-{% endif %}
+    <div id="hint"><h1></h1></div>
 
-<ul class="word">
-    {% for letter in word.letters|make_list %}
-        {% if forloop.first %}
-            <li class="add">+</li>
-        {% endif %}
+    {% word as word %}
 
-        <li class="letter">{{ letter }}</li>
-        <li class="add">+</li>
-    {% endfor %}
-</ul>
+    <input type="text" value="{{ word.letters }}" id="game_input" maxlength="10">
 
-<ul>
-    {% for key in word.possible %}
-        <li>
-            {{ key }} letter words: {{ word.possible|get_item:key|length }}.
-            <span class="answers">
-            {% for word in word.possible|get_item:key %}
-                <span class="answer" data-value="{{ word }}">{{ word }}{% if not forloop.last %}, {% endif %}</span>
-            {% endfor %}
-            </span>
-        </li>
-    {% endfor %}
-</ul>
+    <div class="clearfix" style="text-align: left;">
+        <div style="float: left; width: 50%;">
+            <p>
+                <strong>Answers:</strong><br>
+                {% for key in word.possible %}
+                    {{ key }}-letter words: <span class="track-{{ key }}">0</span>/{{ word.possible|get_item:key|length }}.<br>
+                    {% for word in word.possible|get_item:key %}
+                        <span class="answer" data-value="{{ word }}">
+                            {{ word }}
+                        </span>
+                    {% endfor %}
+                    <span class="answers answers-{{ key }}"><br><br></span>
+                {% endfor %}
+            </p>
+        </div>
+        <div style="float: left; width: 50%;">
+            <p>
+                <strong>Controls:</strong><br>
+                Enter: Submit your answer<br>
+                R: Reset your vowels<br>
+                H: Get a hint.<br>
+                N: New game.<br>
+                V: Show / hide all answers.
+            </p>
+        </div>
+    </div>
 
-<p>
-    <a href="">New word</a> |
-    <a href="#" class="reset">Reset</a> |
-    <a href="#" class="check">Check</a> |
-    <a href="#" class="solve">See answers</a>
-</p>
-
-<p>
-    <form action="/" method="get">
-        <strong># of letters:</strong> <input name="length" type="text" value="{{ word.length }}"><br>
-        <strong>Min num of answers:</strong> <input name="difficulty" type="text" value="{{ word.difficulty }}"><br>
-        <input type="submit">
-    </form>
-</p>
-
-<ul class="options">
-    <li>a</li>
-    <li>e</li>
-    <li>i</li>
-    <li>o</li>
-    <li>u</li>
-</ul>
+</div>
 
 <script>
 var words = [
