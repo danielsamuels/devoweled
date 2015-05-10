@@ -9,5 +9,5 @@ INSTALLED_APPS += (
 
 # Sentry config.
 RAVEN_CONFIG = {
-    'dsn': '',
+    'dsn': 'https://bbe540f965174d2da70ffacd097c59db:6345ee5cc988477489f817f54eed054e@app.getsentry.com/32482',
 }
