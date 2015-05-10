@@ -16,7 +16,7 @@ html, body {
 }
 
 body {
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Helvetica, sans-serif;
     display: block;
     line-height: 1.6;
     font-size: 18px;
@@ -138,13 +138,17 @@ header {
 }
 
 input {
+    font-family: Helvetica Neue, Helvetica, sans-serif;
+    font-weight: 100;
+    margin-bottom: 50px;
+
     width: 100%;
     background-color: transparent;
     color: #fff;
     border: none;
     font-size: 12rem;
     text-transform: uppercase;
-    letter-spacing: 20px;
+    letter-spacing: 30px;
     text-align: center;
     outline: none;
 }
