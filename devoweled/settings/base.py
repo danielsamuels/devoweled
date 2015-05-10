@@ -16,13 +16,12 @@ import os
 
 SITE_NAME = "Devoweled"
 
-SITE_DOMAIN = "Devoweled.com"
+SITE_DOMAIN = "devoweled.posix.me"
 
-PREPEND_WWW = True
+PREPEND_WWW = False
 
 ALLOWED_HOSTS = [
     SITE_DOMAIN,
-    'www.{}'.format(SITE_DOMAIN)
 ]
 
 SUIT_CONFIG = {
@@ -36,9 +35,8 @@ DATABASES = {
         "ENGINE": "django.db.backends.postgresql_psycopg2",
         "NAME": "devoweled",
         "USER": "devoweled",
-        "PASSWORD": "",
-        "HOST": "",
-        "PORT": ""
+        "HOST": "127.0.0.1",
+        "PORT": "5432"
     }
 }
 
