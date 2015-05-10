@@ -8,20 +8,21 @@ register = template.Library()
 
 
 @register.assignment_tag
-def word(length=3, difficulty=5, attempt=1):
+def word(length=3, difficulty=5, attempt=1, letters=None):
     length = int(length)
 
-    letters = Word.objects.filter(
-        no_vowels_length=length,
-    ).order_by('?')[:1]
+    if not letters:
+        letters = Word.objects.filter(
+            no_vowels_length=length,
+        ).order_by('?')[:1]
 
-    if letters:
-        letters = letters[0].no_vowels
-    else:
-        return {
-            'length': length,
-            'difficulty': difficulty
-        }
+        if letters:
+            letters = letters[0].no_vowels
+        else:
+            return {
+                'length': length,
+                'difficulty': difficulty
+            }
 
     # Get all the words which could match these letters.
     possibilities = Word.objects.filter(

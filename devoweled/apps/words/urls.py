@@ -5,5 +5,6 @@ import views
 urlpatterns = patterns(
     "",
 
-    url(r'^$', views.GameView.as_view(), name='game'),
+    url(r'^$', views.LetterPickView.as_view(), name='pick'),
+    url(r'^(?P<letters>\w+)/$', views.GameView.as_view(), name='game'),
 )

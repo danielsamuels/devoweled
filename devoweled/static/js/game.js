@@ -160,7 +160,7 @@ $(function () {
         } else if (e.which == 72) {  // H
             provideHint();
         } else if (e.which == 78) {  // N
-            window.location.reload();
+            window.location = '/';
         } else if (e.which == 86) {  // V
             if ( ! answers_visible) {
                 $('.answer, .answers').show();
